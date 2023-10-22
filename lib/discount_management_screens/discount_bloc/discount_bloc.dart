@@ -24,6 +24,7 @@ class DiscountBloc extends Bloc<DiscountEvent, DiscountState> {
   FutureOr<void> _onAddDiscountCode(
       AddDiscount event, Emitter<DiscountState> emit) async {
     emit(DiscountLoading(username: state.username, codes: state.codes));
+    await _discountCodeRepository.databaseInitialized.future;
 
     await _discountCodeRepository.addDiscount(
       DiscountCodeCreateRequest(
@@ -43,6 +44,8 @@ class DiscountBloc extends Bloc<DiscountEvent, DiscountState> {
   FutureOr<void> _onUpdateDiscountCode(
       UpdateDiscount event, Emitter<DiscountState> emit) async {
     emit(DiscountLoading(username: state.username, codes: state.codes));
+    await _discountCodeRepository.databaseInitialized.future;
+
     await _discountCodeRepository.updateDiscount(DiscountCode(
         id: int.parse(event.codeId),
         code: event.code,
@@ -60,6 +63,8 @@ class DiscountBloc extends Bloc<DiscountEvent, DiscountState> {
   Future<FutureOr<void>> _onDeleteDiscountCode(
       DeleteDiscount event, Emitter<DiscountState> emit) async {
     emit(DiscountLoading(username: state.username, codes: state.codes));
+    await _discountCodeRepository.databaseInitialized.future;
+
     await _discountCodeRepository.deleteDiscount(event.discountCode);
 
     var newList = await _discountCodeRepository.getDiscounts();
@@ -70,6 +75,8 @@ class DiscountBloc extends Bloc<DiscountEvent, DiscountState> {
   FutureOr<void> _onFetchDiscountCodes(
       FetchDiscountCodes event, Emitter<DiscountState> emit) async {
     emit(DiscountLoading(username: state.username, codes: state.codes));
+    await _discountCodeRepository.databaseInitialized.future;
+
 
     var newList = await _discountCodeRepository.getDiscounts();
 

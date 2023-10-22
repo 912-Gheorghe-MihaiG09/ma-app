@@ -10,6 +10,7 @@ class DiscountCodeRepositoryImpl extends DiscountCodeRepository {
 
   DiscountCodeRepositoryImpl() {
     _discountCodes = DiscountCode.getPopulation();
+    super.databaseInitialized.complete();
   }
 
   @override

@@ -4,6 +4,8 @@ import 'package:crud_project/data/domain/discount_code.dart';
 import 'package:crud_project/data/domain/discount_code_create_request.dart';
 
 abstract class DiscountCodeRepository {
+  final Completer databaseInitialized = Completer();
+
   Future<DiscountCode> addDiscount(DiscountCodeCreateRequest request);
 
   Future<List<DiscountCode>> getDiscounts();

@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:intl/intl.dart';
 
 class DiscountCode extends Equatable {
   final int id;
@@ -37,6 +38,29 @@ class DiscountCode extends Equatable {
       discountCodes.add(discountCode);
     }
     return discountCodes;
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'code': code,
+      'description': description,
+      'webSite': webSite,
+      'siteType': siteType,
+      'expirationDate': DateFormat('yyyy-MM-dd').format(expirationDate),
+      'creator': creator,
+    };
+  }
+
+  factory DiscountCode.fromMap(Map<String, dynamic> map) {
+    return DiscountCode(
+      id: map['id'],
+      code: map['code'].toString(),
+      description: map['description'].toString(),
+      webSite: map['webSite'].toString(),
+      siteType: map['siteType'].toString(),
+      expirationDate: DateTime.parse(map['expirationDate'].toString()),
+      creator: map['creator'],
+    );
   }
 
   @override
