@@ -184,7 +184,7 @@ class DiscountScreen extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 32),
                   child: Text(
-                    "Unlock exclusive savings with our discount code! Use code 'SAVE20' at checkout to enjoy a 20% discount on your entire order. Whether you're shopping for clothing, electronics, or home goods, this code is your ticket to significant savings. Don't miss out on this limited-time offer to shop your favorite products at a discounted price. Hurry, grab your deals now!",
+                    discountCode.description,
                     style: Theme.of(context).textTheme.bodyLarge,
                     textAlign: TextAlign.center,
                   ),
