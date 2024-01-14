@@ -48,6 +48,7 @@ class MyApp extends StatelessWidget {
         providers: [
           BlocProvider(
             create: (_) => networkBloc..add(NetworkObserve()),
+            lazy: false,
           ),
           BlocProvider(
             create: (_) => DiscountBloc(_discountCodeRepositoryRemote, networkBloc)

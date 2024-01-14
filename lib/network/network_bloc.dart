@@ -1,8 +1,9 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:bloc/bloc.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:equatable/equatable.dart';
-import 'package:internet_connection_checker/internet_connection_checker.dart';
 
 part 'network_event.dart';
 part 'network_state.dart';
@@ -14,10 +15,11 @@ class NetworkBloc extends Bloc<NetworkEvent, NetworkState> {
   }
 
   FutureOr<void> _networkObserve(event, emit) async {
-    bool isConnected = await InternetConnectionChecker().hasConnection;
+    bool isConnected = (await Connectivity().checkConnectivity()) != ConnectivityResult.none;
     isConnected ? emit(NetworkSuccess()) : emit(NetworkFailed());
-    InternetConnectionChecker().onStatusChange.listen((InternetConnectionStatus status) {
-      add(NetworkNotify(isConnected: status == InternetConnectionStatus.connected));
+    Connectivity().onConnectivityChanged.listen((ConnectivityResult status) {
+      log(status.toString());
+      add(NetworkNotify(isConnected: status != ConnectivityResult.none));
     });
   }
 

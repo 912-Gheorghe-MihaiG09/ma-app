@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:crud_project/data/data_sources/discount_data_source.dart';
 import 'package:crud_project/data/domain/database_action.dart';
 import 'package:crud_project/data/domain/discount_code.dart';
@@ -26,7 +28,7 @@ class DiscountLocalDataSource extends DiscountDataSource {
           ' webSite TEXT, siteType TEXT, expirationDate TEXT, creator TEXT)',
         );
         db.execute(
-          'CREATE TABLE $_logTableName(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, action TEXT, code_id INTEGER, code TEXT, description TEXT,'
+          'CREATE TABLE $_logTableName(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, actionType TEXT, code_id INTEGER, code TEXT, description TEXT,'
           ' webSite TEXT, siteType TEXT, expirationDate TEXT, creator TEXT)',
         );
       },
@@ -111,6 +113,19 @@ class DiscountLocalDataSource extends DiscountDataSource {
 
   Future<void> deleteActions(DatabaseAction action) async{
     await _database
-        .delete(_tableName, where: "id=?", whereArgs: [action.id]);
+        .delete(_logTableName, where: "id=?", whereArgs: [action.id]);
+  }
+  
+  Future<void> deleteDiscountTableData() async{
+    await _database.delete(_tableName);
+  }
+  
+  Future<void> addAllDiscounts(List<DiscountCode> discounts) async{
+    for(DiscountCode code in discounts){
+      var json = code.toJson();
+      json['id'] = code.id;
+      _database.insert(_tableName, json);
+    }
+    log((await _database.query(_tableName)).toString());
   }
 }

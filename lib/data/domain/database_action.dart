@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:crud_project/data/domain/discount_code.dart';
 
 class DatabaseAction {
@@ -9,13 +11,15 @@ class DatabaseAction {
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> json = discountCode.toJson();
+    json['code_id'] = discountCode.id;
     json['actionType'] = actionType.actionName;
     return json;
   }
 
   static DatabaseAction fromJson(Map<String, dynamic> json) {
+    log(json.toString());
     return DatabaseAction(
-      ActionType.fromString(json['action']),
+      ActionType.fromString(json['actionType']),
       DiscountCode(
         id: json['code_id'],
         code: json['code'].toString(),

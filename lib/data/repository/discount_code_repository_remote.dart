@@ -21,6 +21,7 @@ class DiscountCodeRepositoryRemote extends DiscountCodeRepository {
     DiscountCode result;
     try {
       result = await _remoteDataSource.addDiscount(request);
+
     } catch (e) {
       log("$runtimeType addDiscount: $e");
       result = await _localDataSource.addDiscount(request);
@@ -53,6 +54,8 @@ class DiscountCodeRepositoryRemote extends DiscountCodeRepository {
     var result;
     try {
       result = await _remoteDataSource.getDiscounts();
+      await _localDataSource.deleteDiscountTableData();
+      await _localDataSource.addAllDiscounts(result);
     } catch (e) {
       log("$runtimeType getDiscounts: $e");
       result = await _localDataSource.getDiscounts();
