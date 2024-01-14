@@ -1,21 +1,16 @@
-import 'dart:async';
-import 'dart:developer';
-
+import 'package:crud_project/data/data_sources/discount_data_source.dart';
 import 'package:crud_project/data/domain/discount_code.dart';
 import 'package:crud_project/data/domain/discount_code_create_request.dart';
-import 'package:crud_project/data/repository/discount_code_repository.dart';
-import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
+import 'package:sqflite/sqflite.dart';
 
-class DiscountCodeRepositoryLocal extends DiscountCodeRepository {
+class DiscountLocalDataSource extends DiscountDataSource {
   late Database database;
   final String _tableName = "discount_codes";
 
-  DiscountCodeRepositoryLocal() {
-    _initDatabase();
-  }
+  DiscountLocalDataSource();
 
-  Future<void> _initDatabase() async {
+  Future<void> initDatabase() async {
     database = await openDatabase(
       // Set the path to the database. Note: Using the `join` function from the
       // `path` package is best practice to ensure the path is correctly
@@ -33,8 +28,6 @@ class DiscountCodeRepositoryLocal extends DiscountCodeRepository {
       // path to perform database upgrades and downgrades.
       version: 1,
     );
-
-    super.databaseInitialized.complete();
   }
 
   @override
@@ -64,14 +57,9 @@ class DiscountCodeRepositoryLocal extends DiscountCodeRepository {
 
   @override
   Future<DiscountCode?> getDiscount(String discountId) async {
-    try {
-      return DiscountCode.fromJson((await database
-              .query(_tableName, where: "id = ?", whereArgs: [discountId]))
-          .first);
-    } catch (e) {
-      log(e.toString());
-      return null;
-    }
+    return DiscountCode.fromJson((await database
+            .query(_tableName, where: "id = ?", whereArgs: [discountId]))
+        .first);
   }
 
   @override
@@ -85,18 +73,15 @@ class DiscountCodeRepositoryLocal extends DiscountCodeRepository {
 
   @override
   Future<DiscountCode?> updateDiscount(DiscountCode discountCode) async {
-    try {
-      await database.update(
-        _tableName,
-        discountCode.toJson(),
-        where: 'id = ?',
-        whereArgs: [discountCode.id],
-      );
+    database.update(
+      _tableName,
+      discountCode.toJson(),
+      where: 'id = ?',
+      whereArgs: [discountCode.id],
+    );
 
-      return discountCode;
-    } catch (e) {
-      log(e.toString());
-      return null;
-    }
+    return DiscountCode.fromJson((await database
+        .query(_tableName, where: "id = ?", whereArgs: [discountCode.id]))
+        .first);
   }
 }

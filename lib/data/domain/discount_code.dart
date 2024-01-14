@@ -40,7 +40,7 @@ class DiscountCode extends Equatable {
     return discountCodes;
   }
 
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toJson() {
     return {
       'code': code,
       'description': description,
@@ -51,8 +51,7 @@ class DiscountCode extends Equatable {
     };
   }
 
-  factory DiscountCode.fromMap(Map<String, dynamic> map) {
-    return DiscountCode(
+  factory DiscountCode.fromJson(Map<String, dynamic> map) => DiscountCode(
       id: map['id'],
       code: map['code'].toString(),
       description: map['description'].toString(),
@@ -61,7 +60,9 @@ class DiscountCode extends Equatable {
       expirationDate: DateTime.parse(map['expirationDate'].toString()),
       creator: map['creator'],
     );
-  }
+
+  static List<DiscountCode> listFromJson(list) =>
+      List<DiscountCode>.from(list.map((x) => DiscountCode.fromJson(x)));
 
   @override
   List<Object?> get props =>

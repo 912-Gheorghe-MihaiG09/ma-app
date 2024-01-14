@@ -1,3 +1,5 @@
+import 'package:intl/intl.dart';
+
 class DiscountCodeCreateRequest {
   final String code;
   final String description;
@@ -13,4 +15,13 @@ class DiscountCodeCreateRequest {
       required this.siteType,
       required this.expirationDate,
       required this.creator});
+
+  Map<String, dynamic> get toJson => {
+    "code": code,
+    "description": description,
+    "webSite": webSite,
+    "siteType": siteType,
+    "expirationDate": DateFormat('yyyy-MM-dd').format(expirationDate),
+    "creator": creator,
+  };
 }
