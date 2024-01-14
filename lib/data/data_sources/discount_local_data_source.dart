@@ -1,17 +1,19 @@
 import 'package:crud_project/data/data_sources/discount_data_source.dart';
+import 'package:crud_project/data/domain/database_action.dart';
 import 'package:crud_project/data/domain/discount_code.dart';
 import 'package:crud_project/data/domain/discount_code_create_request.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
 class DiscountLocalDataSource extends DiscountDataSource {
-  late Database database;
+  late Database _database;
   final String _tableName = "discount_codes";
+  final String _logTableName = "action_log";
 
   DiscountLocalDataSource();
 
   Future<void> initDatabase() async {
-    database = await openDatabase(
+    _database = await openDatabase(
       // Set the path to the database. Note: Using the `join` function from the
       // `path` package is best practice to ensure the path is correctly
       // constructed for each platform.
@@ -19,8 +21,12 @@ class DiscountLocalDataSource extends DiscountDataSource {
       // When the database is first created, create a table to store dogs.
       onCreate: (db, version) {
         // Run the CREATE TABLE statement on the database.
-        return db.execute(
+        db.execute(
           'CREATE TABLE $_tableName(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, code TEXT, description TEXT,'
+          ' webSite TEXT, siteType TEXT, expirationDate TEXT, creator TEXT)',
+        );
+        db.execute(
+          'CREATE TABLE $_logTableName(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, action TEXT, code_id INTEGER, code TEXT, description TEXT,'
           ' webSite TEXT, siteType TEXT, expirationDate TEXT, creator TEXT)',
         );
       },
@@ -41,30 +47,37 @@ class DiscountLocalDataSource extends DiscountDataSource {
         expirationDate: request.expirationDate,
         creator: request.creator);
 
-    int savedId = await database.insert(_tableName, code.toJson(),
+    int savedId = await _database.insert(_tableName, code.toJson(),
         conflictAlgorithm: ConflictAlgorithm.replace);
 
-    return DiscountCode.fromJson((await database
+    DiscountCode savedCode = DiscountCode.fromJson((await _database
             .query(_tableName, where: "id = ?", whereArgs: [savedId]))
         .first);
+
+    await _database.insert(
+        _logTableName, DatabaseAction(ActionType.add, savedCode).toJson(),);
+
+    return savedCode;
   }
 
   @override
   Future<void> deleteDiscount(DiscountCode discountCode) async {
-    await database
+    await _database
         .delete(_tableName, where: "id=?", whereArgs: [discountCode.id]);
+    await _database.insert(
+      _logTableName, DatabaseAction(ActionType.delete, discountCode).toJson(),);
   }
 
   @override
   Future<DiscountCode?> getDiscount(String discountId) async {
-    return DiscountCode.fromJson((await database
+    return DiscountCode.fromJson((await _database
             .query(_tableName, where: "id = ?", whereArgs: [discountId]))
         .first);
   }
 
   @override
   Future<List<DiscountCode>> getDiscounts() async {
-    final List<Map<String, dynamic>> maps = await database.query(_tableName);
+    final List<Map<String, dynamic>> maps = await _database.query(_tableName);
 
     return List.generate(maps.length, (i) {
       return DiscountCode.fromJson(maps[i]);
@@ -73,15 +86,31 @@ class DiscountLocalDataSource extends DiscountDataSource {
 
   @override
   Future<DiscountCode?> updateDiscount(DiscountCode discountCode) async {
-    database.update(
+    _database.update(
       _tableName,
       discountCode.toJson(),
       where: 'id = ?',
       whereArgs: [discountCode.id],
     );
 
-    return DiscountCode.fromJson((await database
-        .query(_tableName, where: "id = ?", whereArgs: [discountCode.id]))
+    await _database.insert(
+      _logTableName, DatabaseAction(ActionType.update, discountCode).toJson(),);
+
+    return DiscountCode.fromJson((await _database
+            .query(_tableName, where: "id = ?", whereArgs: [discountCode.id]))
         .first);
+  }
+
+  Future<List<DatabaseAction>> getActions() async{
+    final List<Map<String, dynamic>> maps = await _database.query(_logTableName);
+
+    return List.generate(maps.length, (i) {
+      return DatabaseAction.fromJson(maps[i]);
+    });
+  }
+
+  Future<void> deleteActions(DatabaseAction action) async{
+    await _database
+        .delete(_tableName, where: "id=?", whereArgs: [action.id]);
   }
 }

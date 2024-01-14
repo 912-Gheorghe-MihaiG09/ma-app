@@ -8,6 +8,7 @@ import 'package:crud_project/data/repository/discount_code_repository_remote.dar
 import 'package:crud_project/data/service/discount_service.dart';
 import 'package:crud_project/discount_management_screens/discount_bloc/discount_bloc.dart';
 import 'package:crud_project/home/home_page.dart';
+import 'package:crud_project/network/network_bloc.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -35,15 +36,24 @@ class MyApp extends StatelessWidget {
     ),
   );
 
+  final networkBloc = NetworkBloc();
+
   MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return RepositoryProvider(
       create: (_) => _discountCodeRepositoryRemote,
-      child: BlocProvider(
-        create: (_) => DiscountBloc(_discountCodeRepositoryRemote)
-          ..add(const FetchDiscountCodes()),
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            create: (_) => networkBloc..add(NetworkObserve()),
+          ),
+          BlocProvider(
+            create: (_) => DiscountBloc(_discountCodeRepositoryRemote, networkBloc)
+              ..add(const FetchDiscountCodes()),
+          )
+        ],
         child: MaterialApp(
           title: 'Flutter Demo',
           theme: ThemeBuilder.getThemeData(),

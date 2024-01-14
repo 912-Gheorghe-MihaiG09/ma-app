@@ -68,3 +68,5 @@ class UpdateUsername extends DiscountEvent {
   @override
   List<Object?> get props => [username];
 }
+
+class SyncDiscounts extends DiscountEvent{}

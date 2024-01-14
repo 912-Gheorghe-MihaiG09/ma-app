@@ -1,3 +1,4 @@
+import 'package:crud_project/data/domain/discount_code_create_request.dart';
 import 'package:equatable/equatable.dart';
 import 'package:intl/intl.dart';
 
@@ -52,17 +53,25 @@ class DiscountCode extends Equatable {
   }
 
   factory DiscountCode.fromJson(Map<String, dynamic> map) => DiscountCode(
-      id: map['id'],
-      code: map['code'].toString(),
-      description: map['description'].toString(),
-      webSite: map['webSite'].toString(),
-      siteType: map['siteType'].toString(),
-      expirationDate: DateTime.parse(map['expirationDate'].toString()),
-      creator: map['creator'],
-    );
+        id: map['id'],
+        code: map['code'].toString(),
+        description: map['description'].toString(),
+        webSite: map['webSite'].toString(),
+        siteType: map['siteType'].toString(),
+        expirationDate: DateTime.parse(map['expirationDate'].toString()),
+        creator: map['creator'],
+      );
 
   static List<DiscountCode> listFromJson(list) =>
       List<DiscountCode>.from(list.map((x) => DiscountCode.fromJson(x)));
+
+  DiscountCodeCreateRequest toCreateRequest() => DiscountCodeCreateRequest(
+      code: code,
+      description: description,
+      webSite: webSite,
+      siteType: siteType,
+      expirationDate: expirationDate,
+      creator: creator);
 
   @override
   List<Object?> get props =>
