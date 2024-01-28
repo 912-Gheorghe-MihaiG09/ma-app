@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:crud_project/data/data_sources/discount_local_data_source.dart';
@@ -10,10 +11,16 @@ import 'package:crud_project/data/repository/discount_code_repository.dart';
 class DiscountCodeRepositoryRemote extends DiscountCodeRepository {
   final DiscountLocalDataSource _localDataSource;
   final DiscountRemoteDataSource _remoteDataSource;
+  final Completer localDbInit = Completer();
 
   DiscountCodeRepositoryRemote(this._localDataSource, this._remoteDataSource) {
     _localDataSource.initDatabase().then(
-        (_) => syncServer().then((__) => super.databaseInitialized.complete()));
+        (_){
+          if(!localDbInit.isCompleted) {
+            localDbInit.complete();
+          }
+          syncServer().then((__) => super.databaseInitialized.complete());
+        });
   }
 
   @override
@@ -76,6 +83,9 @@ class DiscountCodeRepositoryRemote extends DiscountCodeRepository {
   }
 
   Future<void> syncServer() async {
+    if(!localDbInit.isCompleted){
+      return;
+    }
     List<DatabaseAction> actions = await _localDataSource.getActions();
     try {
       for (DatabaseAction action in actions) {
