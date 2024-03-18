@@ -63,6 +63,27 @@ class DiscountCode extends Equatable {
     );
   }
 
+  DiscountCode copyWith({
+    int? id,
+    String? code,
+    String? description,
+    String? webSite,
+    String? siteType,
+    DateTime? expirationDate,
+    String? creator,
+  }) {
+    return DiscountCode(
+      id: id ?? this.id,
+      code: code ?? this.code,
+      description: description ?? this.description,
+      webSite: webSite ?? this.webSite,
+      siteType: siteType ?? this.siteType,
+      expirationDate: expirationDate ?? this.expirationDate,
+      creator: creator ?? this.creator,
+    );
+  }
+
+
   @override
   List<Object?> get props =>
       [id, code, description, webSite, siteType, expirationDate, creator];

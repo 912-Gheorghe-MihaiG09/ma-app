@@ -68,3 +68,9 @@ class UpdateUsername extends DiscountEvent {
   @override
   List<Object?> get props => [username];
 }
+
+class FilterByExpiration extends DiscountEvent{
+  final bool available;
+
+  const FilterByExpiration(this.available);
+}

@@ -18,6 +18,7 @@ class DiscountBloc extends Bloc<DiscountEvent, DiscountState> {
     on<UpdateDiscount>(_onUpdateDiscountCode);
     on<DeleteDiscount>(_onDeleteDiscountCode);
     on<FetchDiscountCodes>(_onFetchDiscountCodes);
+    on<FilterByExpiration>(_onFilterByExpiration);
     on<UpdateUsername>(_onUpdateUsername);
   }
 
@@ -87,5 +88,15 @@ class DiscountBloc extends Bloc<DiscountEvent, DiscountState> {
       UpdateUsername event, Emitter<DiscountState> emit) {
     emit(DiscountLoading(username: state.username, codes: state.codes));
     emit(DiscountLoaded(username: event.username, codes: state.codes));
+  }
+
+  FutureOr<void> _onFilterByExpiration(FilterByExpiration event, Emitter<DiscountState> emit) async {
+    emit(DiscountLoading(username: state.username, codes: state.codes));
+    await _discountCodeRepository.databaseInitialized.future;
+
+
+    var newList = await _discountCodeRepository.getDiscountsByAvailability(event.available);
+
+    emit(DiscountLoaded(username: state.username, codes: newList));
   }
 }

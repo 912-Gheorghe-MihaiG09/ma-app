@@ -99,4 +99,10 @@ class DiscountCodeRepositoryLocal extends DiscountCodeRepository {
       return null;
     }
   }
+
+  @override
+  Future<List<DiscountCode>> getDiscountsByAvailability(bool available) {
+    // TODO: implement getDiscountsByAvailability
+    throw UnimplementedError();
+  }
 }

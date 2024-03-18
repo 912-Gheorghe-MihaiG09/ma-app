@@ -66,4 +66,19 @@ class DiscountCodeRepositoryImpl extends DiscountCodeRepository {
     }
     return null;
   }
+
+  @override
+  Future<List<DiscountCode>> getDiscountsByAvailability(bool available) async {
+    await Future.delayed(const Duration(seconds: 1));
+    try {
+      if(available){
+        return _discountCodes
+            .where((element) => DateTime.now().isBefore(element.expirationDate)).toList();
+      }
+      return _discountCodes
+          .where((element) => DateTime.now().isAfter(element.expirationDate)).toList();
+    } on StateError {
+      return [];
+    }
+  }
 }

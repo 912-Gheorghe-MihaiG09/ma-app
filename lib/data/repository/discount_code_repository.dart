@@ -15,4 +15,6 @@ abstract class DiscountCodeRepository {
   Future<DiscountCode?> updateDiscount(DiscountCode discountCode);
 
   Future<void> deleteDiscount(DiscountCode discountCode);
+
+  Future<List<DiscountCode>> getDiscountsByAvailability(bool available);
 }
